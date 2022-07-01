@@ -349,13 +349,15 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
     1
     """
     # BEGIN PROBLEM 9
+
     averaged_dice = make_averaged(roll_dice, trials_count)
     num_rolls_candidate = list(range(1, 11))
-    running_max_score, max_scoring_num_roll = 0, 0
+    max_score, max_scoring_num_roll = 0, 0
+
     for x in num_rolls_candidate:
         score = averaged_dice(x, dice)
-        if score > running_max_score:
-            running_max_score, max_scoring_num_roll = score, x
+        if score > max_score:
+            max_score, max_scoring_num_roll = score, x
     return max_scoring_num_roll
     # END PROBLEM 9
 
@@ -426,12 +428,12 @@ def extra_turn_strategy(score, opponent_score, cutoff=8, num_rolls=6):
 
 
 def final_strategy(score, opponent_score):
-    """Write a brief description of your final strategy.
+    """The final fantasy to end hog game, based on extra turn strategy."""
 
-    *** YOUR DESCRIPTION HERE ***
-    """
     # BEGIN PROBLEM 12
-    return 6  # Replace this statement
+    if score > opponent_score:
+        return extra_turn_strategy(score, opponent_score, GOAL_SCORE - score, 4)
+    return extra_turn_strategy(score, opponent_score, opponent_score - score, 4)
     # END PROBLEM 12
 
 
