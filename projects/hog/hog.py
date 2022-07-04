@@ -14,7 +14,7 @@ FIRST_101_DIGITS_OF_PI = 3141592653589793238462643383279502884197169399375105820
 
 
 def roll_dice(num_rolls, dice=six_sided):
-    """Simulate rolling the DICE exactly NUM_ROLLS > 0 times. Return the sum of
+    """ Simulate rolling the DICE exactly NUM_ROLLS > 0 times. Return the sum of
     the outcomes unless any of the outcomes is 1. In that case, return 1.
 
     num_rolls:  The number of dice rolls that will be made.
@@ -34,7 +34,7 @@ def roll_dice(num_rolls, dice=six_sided):
 
 
 def free_bacon(score):
-    """Return the points scored from rolling 0 dice (Free Bacon).
+    """ Return the points scored from rolling 0 dice (Free Bacon).
 
     score:  The opponent's current score.
     """
@@ -50,7 +50,7 @@ def free_bacon(score):
 
 
 def take_turn(num_rolls, opponent_score, dice=six_sided):
-    """Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free Bacon).
+    """ Simulate a turn rolling NUM_ROLLS dice, which may be 0 (Free Bacon).
     Return the points scored for the turn by the current player.
 
     num_rolls:       The number of dice rolls that will be made.
@@ -70,13 +70,13 @@ def take_turn(num_rolls, opponent_score, dice=six_sided):
 
 
 def extra_turn(player_score, opponent_score):
-    """Return whether the player gets an extra turn."""
+    """ Return whether the player gets an extra turn."""
     return (pig_pass(player_score, opponent_score) or
             swine_align(player_score, opponent_score))
 
 
 def swine_align(player_score, opponent_score):
-    """Return whether the player gets an extra turn due to Swine Align.
+    """ Return whether the player gets an extra turn due to Swine Align.
 
     player_score:   The total score of the current player.
     opponent_score: The total score of the other player.
@@ -97,7 +97,7 @@ def swine_align(player_score, opponent_score):
 
 
 def pig_pass(player_score, opponent_score):
-    """Return whether the player gets an extra turn due to Pig Pass.
+    """ Return whether the player gets an extra turn due to Pig Pass.
 
     player_score:   The total score of the current player.
     opponent_score: The total score of the other player.
@@ -123,7 +123,7 @@ def pig_pass(player_score, opponent_score):
 
 
 def other(who):
-    """Return the other player, for a player WHO numbered 0 or 1.
+    """ Return the other player, for a player WHO numbered 0 or 1.
 
     >>> other(0)
     1
@@ -134,13 +134,13 @@ def other(who):
 
 
 def silence(score0, score1):
-    """Announce nothing (see Phase 2)."""
+    """ Announce nothing (see Phase 2)."""
     return silence
 
 
 def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
          goal=GOAL_SCORE, say=silence):
-    """Simulate a game and return the final scores of both players, with Player
+    """ Simulate a game and return the final scores of both players, with Player
     0's score first, and Player 1's score second.
 
     A strategy is a function that takes two total scores as arguments (the
@@ -192,13 +192,13 @@ def play(strategy0, strategy1, score0=0, score1=0, dice=six_sided,
 
 
 def say_scores(score0, score1):
-    """A commentary function that announces the score for each player."""
+    """ A commentary function that announces the score for each player."""
     print("Player 0 now has", score0, "and Player 1 now has", score1)
     return say_scores
 
 
 def announce_lead_changes(last_leader=None):
-    """Return a commentary function that announces lead changes.
+    """ Return a commentary function that announces lead changes.
 
     >>> f0 = announce_lead_changes()
     >>> f1 = f0(5, 0)
@@ -226,7 +226,7 @@ def announce_lead_changes(last_leader=None):
 
 
 def both(f, g):
-    """Return a commentary function that says what f says, then what g says.
+    """ Return a commentary function that says what f says, then what g says.
 
     NOTE: the following game is not possible under the rules, it's just
     an example for the sake of the doctest
@@ -249,7 +249,7 @@ def both(f, g):
 
 
 def announce_highest(who, last_score=0, running_high=0):
-    """Return a commentary function that announces when WHO's score
+    """ Return a commentary function that announces when WHO's score
     increases by more than ever before in the game.
 
     NOTE: the following game is not possible under the rules, it's just
@@ -296,7 +296,7 @@ def announce_highest(who, last_score=0, running_high=0):
 
 
 def always_roll(n):
-    """Return a strategy that always rolls N dice.
+    """ Return a strategy that always rolls N dice.
 
     A strategy is a function that takes two total scores as arguments (the
     current player's score, and the opponent's score), and returns a number of
@@ -316,7 +316,7 @@ def always_roll(n):
 
 
 def make_averaged(original_function, trials_count=1000):
-    """Return a function that returns the average value of ORIGINAL_FUNCTION
+    """ Return a function that returns the average value of ORIGINAL_FUNCTION
     when called.
 
     To implement this function, you will have to use *args syntax, a new Python
@@ -340,7 +340,7 @@ def make_averaged(original_function, trials_count=1000):
 
 
 def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
-    """Return the number of dice (1 to 10) that gives the highest average turn
+    """ Return the number of dice (1 to 10) that gives the highest average turn
     score by calling roll_dice with the provided DICE over TRIALS_COUNT times.
     Assume that the dice always return positive outcomes.
 
@@ -363,7 +363,7 @@ def max_scoring_num_rolls(dice=six_sided, trials_count=1000):
 
 
 def winner(strategy0, strategy1):
-    """Return 0 if strategy0 wins against strategy1, and 1 otherwise."""
+    """ Return 0 if strategy0 wins against strategy1, and 1 otherwise."""
     score0, score1 = play(strategy0, strategy1)
     if score0 > score1:
         return 0
@@ -372,7 +372,7 @@ def winner(strategy0, strategy1):
 
 
 def average_win_rate(strategy, baseline=always_roll(6)):
-    """Return the average win rate of STRATEGY against BASELINE. Averages the
+    """ Return the average win rate of STRATEGY against BASELINE. Averages the
     winrate when starting the game as player 0 and as player 1.
     """
     win_rate_as_player_0 = 1 - make_averaged(winner)(strategy, baseline)
@@ -382,7 +382,7 @@ def average_win_rate(strategy, baseline=always_roll(6)):
 
 
 def run_experiments():
-    """Run a series of strategy experiments and report results."""
+    """ Run a series of strategy experiments and report results."""
     if True:  # Change to False when done finding max_scoring_num_rolls
         six_sided_max = max_scoring_num_rolls(six_sided)
         print('Max scoring num rolls for six-sided dice:', six_sided_max)
@@ -403,7 +403,7 @@ def run_experiments():
 
 
 def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
-    """This strategy rolls 0 dice if that gives at least CUTOFF points, and
+    """ This strategy rolls 0 dice if that gives at least CUTOFF points, and
     rolls NUM_ROLLS otherwise.
     """
     # BEGIN PROBLEM 10
@@ -415,7 +415,7 @@ def bacon_strategy(score, opponent_score, cutoff=8, num_rolls=6):
 
 
 def extra_turn_strategy(score, opponent_score, cutoff=8, num_rolls=6):
-    """This strategy rolls 0 dice when it triggers an extra turn. It also
+    """ This strategy rolls 0 dice when it triggers an extra turn. It also
     rolls 0 dice if it gives at least CUTOFF points and does not give an extra turn.
     Otherwise, it rolls NUM_ROLLS.
     """
@@ -428,7 +428,7 @@ def extra_turn_strategy(score, opponent_score, cutoff=8, num_rolls=6):
 
 
 def final_strategy(score, opponent_score):
-    """The final fantasy to end hog game, based on extra turn strategy."""
+    """ The final fantasy to end hog game, based on extra turn strategy."""
 
     # BEGIN PROBLEM 12
     if score > opponent_score:
@@ -447,7 +447,7 @@ def final_strategy(score, opponent_score):
 
 @main
 def run(*args):
-    """Read in the command-line argument and calls corresponding functions."""
+    """ Read in the command-line argument and calls corresponding functions."""
     import argparse
     parser = argparse.ArgumentParser(description="Play Hog")
     parser.add_argument('--run_experiments', '-r', action='store_true',

@@ -17,7 +17,7 @@ def lambda_curry2(func):
 
 
 def count_cond(condition):
-    """Returns a function with one parameter N that counts all the numbers from
+    """ Returns a function with one parameter N that counts all the numbers from
     1 to N that satisfy the two-argument predicate function Condition, where
     the first argument for Condition is N and the second argument is the
     number from 1 to N.
@@ -56,7 +56,7 @@ def count_cond(condition):
 
 
 def compose1(f, g):
-    """Return the composition function which given x, computes f(g(x)).
+    """ Return the composition function which given x, computes f(g(x)).
 
     >>> add_one = lambda x: x + 1        # adds one to x
     >>> square = lambda x: x**2
@@ -97,7 +97,7 @@ def composite_identity(f, g):
 
 
 def cycle(f1, f2, f3):
-    """Returns a function that is itself a higher-order function.
+    """ Returns a function that is itself a higher-order function.
 
     >>> def add1(x):
     ...     return x + 1

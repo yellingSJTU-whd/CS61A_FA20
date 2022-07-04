@@ -1,5 +1,5 @@
 def keep_ints(cond, n):
-    """Print out all integers 1..i..n where cond(i) is true
+    """ Print out all integers 1..i..n where cond(i) is true
 
     >>> def is_even(x):
     ...     # Even numbers have remainder 0 when divided by 2.
@@ -15,7 +15,7 @@ def keep_ints(cond, n):
 
 
 def make_keeper(n):
-    """Returns a function which takes one parameter cond and prints out
+    """ Returns a function which takes one parameter cond and prints out
     all integers 1..i..n where calling cond(i)returns True.
 
     >>> def is_even(x):
@@ -36,7 +36,7 @@ def make_keeper(n):
 
 
 def print_delayed(x):
-    """Return a new function. This new function, when called,
+    """ Return a new function. This new function, when called,
 will print out x and return another function with the same
 behavior.
     >>> f = print_delayed(1)

@@ -1,5 +1,5 @@
 def falling(n, k):
-    """Compute the falling factorial of n to depth k.
+    """ Compute the falling factorial of n to depth k.
 
     >>> falling(6, 3)  # 6 * 5 * 4
     120
@@ -17,7 +17,7 @@ def falling(n, k):
 
 
 def sum_digits(y):
-    """Sum all the digits of y.
+    """ Sum all the digits of y.
 
     >>> sum_digits(10) # 1 + 0 = 1
     1
@@ -36,7 +36,7 @@ def sum_digits(y):
 
 
 def double_eights(n):
-    """Return true if n has two eights in a row.
+    """ Return true if n has two eights in a row.
     >>> double_eights(8)
     False
     >>> double_eights(88)
