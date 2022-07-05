@@ -66,17 +66,24 @@ def pingpong(n):
     def turning(num):
         if num % 8 == 0:
             return True
-        while num > 0:
-            if num % 10 == 8:
-                return True
-            num = num // 10
+        if '8' in str(num):
+            return True
         return False
 
+    def signal(num):
+        assert num > 0
+        if num == 1:
+            return 0
+        return signal(num - 1) + turning(num - 1)
 
-    if n == 1:
-        return 1
+    def helper(num):
+        if num == 1:
+            return 1
+        if signal(num) % 2 == 0:
+            return helper(num - 1) + 1
+        return helper(num - 1) - 1
 
-    if
+    return helper(n)
 
 
 def missing_digits(n):
@@ -145,7 +152,7 @@ def count_coins(total):
     "*** YOUR CODE HERE ***"
 
 
-from operator import sub, mul
+from operator import sub, mul, add
 
 
 def make_anonymous_factorial():
