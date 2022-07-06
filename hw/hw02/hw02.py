@@ -1,3 +1,5 @@
+from operator import sub, mul
+
 HW_SOURCE_FILE = __file__
 
 
@@ -66,11 +68,14 @@ def pingpong(n):
     def turning(num):
         if num % 8 == 0:
             return True
-        if '8' in str(num):
+        if num_eights(num):
             return True
         return False
 
     def signal(num):
+        """
+        Return an even number if counting up, or odd otherwise.
+        """
         assert num > 0
         if num == 1:
             return 0
@@ -113,7 +118,22 @@ def missing_digits(n):
     >>> check(HW_SOURCE_FILE, 'missing_digits', ['While', 'For'])
     True
     """
-    "*** YOUR CODE HERE ***"
+
+    def helper(index):
+        stringify = str(n)
+        assert index < len(stringify)
+
+        if index == 0:
+            return 0
+
+        pre = int(stringify[index - 1])
+        curr = int(stringify[index])
+
+        if pre == curr:
+            return helper(index - 1)
+        return curr - pre - 1 + helper(index - 1)
+
+    return helper(len(str(n)) - 1)
 
 
 def next_largest_coin(coin):
@@ -149,10 +169,21 @@ def count_coins(total):
     >>> check(HW_SOURCE_FILE, 'count_coins', ['While', 'For'])                                          
     True
     """
-    "*** YOUR CODE HERE ***"
 
+    def helper(target, smallest_coin):
+        if target == 0:
+            return 1
+        elif target < 0:
+            return 0
+        elif not smallest_coin:
+            return 0
+        else:
+            next_coin = next_largest_coin(smallest_coin)
+            with_smallest_coin = helper(target - smallest_coin, smallest_coin)
+            without_smallest_coin = helper(target, next_coin)
+            return with_smallest_coin + without_smallest_coin
 
-from operator import sub, mul, add
+    return helper(total, 1)
 
 
 def make_anonymous_factorial():
@@ -165,4 +196,4 @@ def make_anonymous_factorial():
     >>> check(HW_SOURCE_FILE, 'make_anonymous_factorial', ['Assign', 'AugAssign', 'FunctionDef', 'Recursion'])
     True
     """
-    return 'YOUR_EXPRESSION_HERE'
+    return lambda n: (lambda f, x: f(f, x))(lambda f, x: 1 if x == 1 else x * f(f, x - 1), n)
