@@ -114,18 +114,32 @@ def max_subseq(n, t):
     """
     assert t >= 0
 
-    def helper(stringified_num, i):
+    def helper(subsequence, i, selected_nums):
         if not i:
             return 0
-        length = len(stringified_num)
+        length = len(subsequence)
         if length <= i:
-            return int(stringified_num)
+            return int(selected_nums + subsequence)
+        if i == 1:
+            single_digit = []
+            single_digit[:] = subsequence[:]
+            return int(selected_nums + max(single_digit))
 
         num_list = []
-        num_list[:i] = stringified_num[:i]
+        num_list[:1 - i] = subsequence[:1 - i]
         selected = max(num_list)
-        for()
+        index_list = []
+        for j in range(len(num_list)):
+            if num_list[j] == selected:
+                index_list = index_list + [j]
 
+        candidate_list = []
+        for k in index_list:
+            process = helper(subsequence[k + 1:], i - 1, selected_nums + selected)
+            candidate_list = candidate_list + [process]
+        return max(candidate_list)
+
+    return helper(str(n), t, '')
 
 
 def add_chars(w1, w2):
@@ -154,4 +168,14 @@ def add_chars(w1, w2):
     ...       ['For', 'While', 'Set', 'SetComp']) # Must use recursion
     True
     """
-    "*** YOUR CODE HERE ***"
+
+    def process(sub1, sub2, builder):
+        if not sub1:
+            return builder + sub2
+
+        if sub1[0] != sub2[0]:
+            builder = builder + sub2[0]
+            return process(sub1, sub2[1:], builder)
+        return process(sub1[1:], sub2[1:], builder)
+
+    return process(w1, w2, '')
