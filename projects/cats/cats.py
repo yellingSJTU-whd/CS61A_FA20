@@ -91,7 +91,8 @@ def wpm(typed, elapsed):
     """Return the words-per-minute (WPM) of the TYPED string."""
     assert elapsed > 0, 'Elapsed time must be positive'
     # BEGIN PROBLEM 4
-    "*** YOUR CODE HERE ***"
+    words = len(typed) / 5
+    return words / (elapsed / 60)
     # END PROBLEM 4
 
 
@@ -101,7 +102,17 @@ def autocorrect(user_word, valid_words, diff_function, limit):
     than LIMIT.
     """
     # BEGIN PROBLEM 5
-    "*** YOUR CODE HERE ***"
+    if user_word in valid_words:
+        return user_word
+
+    def diff_from_user_word(valid_word):
+        return diff_function(user_word, valid_word, limit)
+
+    min_diff_word = min(valid_words, key=diff_from_user_word)
+    if diff_from_user_word(min_diff_word) > limit:
+        return user_word
+    return min_diff_word
+
     # END PROBLEM 5
 
 
@@ -110,31 +121,64 @@ def shifty_shifts(start, goal, limit):
     in START need to be substituted to create GOAL, then adds the difference in
     their lengths.
     """
+
     # BEGIN PROBLEM 6
-    assert False, 'Remove this line'
+    def helper(str1, str2, lim):
+        if not str1 and not str2:
+            return 0
+        if not str1:
+            if lim == 0:
+                return 1
+            return 1 + helper(str1, str2[1:], lim - 1)
+        if not str2:
+            if lim == 0:
+                return 1
+            return 1 + helper(str1[1:], str2, lim - 1)
+        if str1[0] != str2[0]:
+            if lim == 0:
+                return 1
+            return 1 + helper(str1[1:], str2[1:], lim - 1)
+        return helper(str1[1:], str2[1:], lim)
+
+    return helper(start, goal, limit)
     # END PROBLEM 6
 
 
 def pawssible_patches(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL."""
-    assert False, 'Remove this line'
 
-    if ______________:  # Fill in the condition
+    if not start and not goal:
+        print("DEBUG:", "branch 0")
+        return 0
+
+    if not start and goal:  # Fill in the condition
         # BEGIN
-        "*** YOUR CODE HERE ***"
+        print("DEBUG:", "branch 1", goal)
+        if limit == 0:
+            return 1
+        return 1 + pawssible_patches(start, goal[:-1], limit - 1)
         # END
 
-    elif ___________:  # Feel free to remove or add additional cases
+    elif start and not goal:  # Feel free to remove or add additional cases
         # BEGIN
-        "*** YOUR CODE HERE ***"
+        print("DEBUG:", "branch 2", start)
+        if limit == 0:
+            return 1
+        return 1 + pawssible_patches(start[:-1], goal, limit - 1)
         # END
+
+    elif start[len(start) - 1] == goal[len(goal) - 1]:
+        print("DEBUG:", "branch 3", start, goal)
+        return pawssible_patches(start[:-1], goal[:-1], limit)
 
     else:
-        add_diff = ...  # Fill in these lines
-        remove_diff = ...
-        substitute_diff = ...
+        print("DEBUG:", "branch 4", start, goal)
+        add_diff = pawssible_patches(start + goal[len(goal) - 1], goal, limit - 1)
+        remove_diff = pawssible_patches(start[:-1], goal, limit - 1)
+        substitute_diff = pawssible_patches(start[:-1], goal[:-1], limit - 1)
+        print("DEBUG:", "Add", add_diff, "Remove", remove_diff, "Sub", substitute_diff)
         # BEGIN
-        "*** YOUR CODE HERE ***"
+        return min(add_diff, remove_diff, substitute_diff)
         # END
 
 
