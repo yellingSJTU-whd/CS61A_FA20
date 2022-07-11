@@ -126,18 +126,22 @@ def shifty_shifts(start, goal, limit):
     def helper(str1, str2, lim):
         if not str1 and not str2:
             return 0
+
         if not str1:
             if lim == 0:
                 return 1
             return 1 + helper(str1, str2[1:], lim - 1)
+
         if not str2:
             if lim == 0:
                 return 1
             return 1 + helper(str1[1:], str2, lim - 1)
+
         if str1[0] != str2[0]:
             if lim == 0:
                 return 1
             return 1 + helper(str1[1:], str2[1:], lim - 1)
+
         return helper(str1[1:], str2[1:], lim)
 
     return helper(start, goal, limit)
@@ -148,35 +152,31 @@ def pawssible_patches(start, goal, limit):
     """A diff function that computes the edit distance from START to GOAL."""
 
     if not start and not goal:
-        print("DEBUG:", "branch 0")
         return 0
 
     if not start and goal:  # Fill in the condition
         # BEGIN
-        print("DEBUG:", "branch 1", goal)
         if limit == 0:
             return 1
-        return 1 + pawssible_patches(start, goal[:-1], limit - 1)
+        return 1 + pawssible_patches(start, goal[1:], limit - 1)
         # END
 
     elif start and not goal:  # Feel free to remove or add additional cases
         # BEGIN
-        print("DEBUG:", "branch 2", start)
         if limit == 0:
             return 1
-        return 1 + pawssible_patches(start[:-1], goal, limit - 1)
+        return 1 + pawssible_patches(start[1:], goal, limit - 1)
         # END
 
-    elif start[len(start) - 1] == goal[len(goal) - 1]:
-        print("DEBUG:", "branch 3", start, goal)
-        return pawssible_patches(start[:-1], goal[:-1], limit)
+    elif start[0] == goal[0]:
+        return pawssible_patches(start[1:], goal[1:], limit)
 
     else:
-        print("DEBUG:", "branch 4", start, goal)
-        add_diff = pawssible_patches(start + goal[len(goal) - 1], goal, limit - 1)
-        remove_diff = pawssible_patches(start[:-1], goal, limit - 1)
-        substitute_diff = pawssible_patches(start[:-1], goal[:-1], limit - 1)
-        print("DEBUG:", "Add", add_diff, "Remove", remove_diff, "Sub", substitute_diff)
+        if limit == 0:
+            return 1
+        add_diff = pawssible_patches(start, goal[1:], limit - 1) + 1
+        remove_diff = pawssible_patches(start[1:], goal, limit - 1) + 1
+        substitute_diff = pawssible_patches(start[1:], goal[1:], limit - 1) + 1
         # BEGIN
         return min(add_diff, remove_diff, substitute_diff)
         # END
@@ -195,7 +195,20 @@ def final_diff(start, goal, limit):
 def report_progress(typed, prompt, user_id, send):
     """Send a report of your id and progress so far to the multiplayer server."""
     # BEGIN PROBLEM 8
-    "*** YOUR CODE HERE ***"
+    progress = 0
+    found = False
+    for x in range(len(typed)):
+        if typed[x] != prompt[x]:
+            progress = x / len(prompt)
+            found = True
+            break
+
+    if not found:
+        progress = len(typed) / len(prompt)
+
+    dictionary = {'id': user_id, 'progress': progress}
+    send(dictionary)
+    return progress
     # END PROBLEM 8
 
 
@@ -220,9 +233,21 @@ def time_per_word(times_per_player, words):
                           the player finished typing each word.
         words: a list of words, in the order they are typed.
     """
+
     # BEGIN PROBLEM 9
-    "*** YOUR CODE HERE ***"
+    def cal_time_per_word(times):
+        res = []
+        for x in times:
+            time_list = []
+
+            for y in range(1, len(x)):
+                time_list += [x[y] - x[y - 1]]
+            res += [time_list]
+
+        return res
+
     # END PROBLEM 9
+    return game(words, cal_time_per_word(times_per_player))
 
 
 def fastest_words(game):
@@ -235,8 +260,34 @@ def fastest_words(game):
     """
     player_indices = range(len(all_times(game)))  # contains an *index* for each player
     word_indices = range(len(all_words(game)))  # contains an *index* for each word
+
     # BEGIN PROBLEM 10
-    "*** YOUR CODE HERE ***"
+    def construct_nested_list(dimension):
+        assert dimension > 0
+        outer = []
+        for x in range(dimension):
+            nested = []
+            outer += [nested]
+        return outer
+
+    players_num = len(all_times(game))
+    result = construct_nested_list(players_num)
+
+    for w in word_indices:
+        curr_word = word_at(game, w)
+        min_time_per_word = time(game, 0, w) + 1
+        index = players_num
+
+        for p in player_indices:
+            t = time(game, p, w)
+            if t < min_time_per_word:
+                min_time_per_word = t
+                index = p
+
+        result[index] += [curr_word]
+
+    return result
+
     # END PROBLEM 10
 
 
