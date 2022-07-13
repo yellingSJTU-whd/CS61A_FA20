@@ -59,10 +59,10 @@ def find_path(tree, x):
     """
     if label(tree) == x:
         return [label(tree)]
+
     for branch in branches(tree):
-        path = [label(tree)] + find_path(branch, x)
-        if x not in path:
-            return None
+        if find_path(branch, x) is not None:
+            return [label(tree)] + find_path(branch, x)
 
 
 # Tree ADT
