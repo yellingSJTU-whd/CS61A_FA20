@@ -65,6 +65,33 @@ def find_path(tree, x):
             return [label(tree)] + find_path(branch, x)
 
 
+def prune_binary(t, nums):
+    """
+    >>> t = tree('1', [tree('0', [tree('0'), tree('1')]), tree('1', [tree('0')])])
+    >>> res = prune_binary(t, ['01', '110', '100'])
+    >>> ref = tree('1', [tree('0', [tree('0')]), tree('1', [tree('0')])])
+    >>> res == ref
+    True
+
+    """
+    if is_leaf(t):
+        if label(t) in nums:
+            return t
+        return None
+
+    else:
+        next_valid_nums = [x[1:] for x in nums if x[0] == label(t)]
+        new_branches = []
+        for branch in branches(t):
+            pruned_branch = prune_binary(branch, next_valid_nums)
+            if pruned_branch is not None:
+                new_branches = new_branches + [pruned_branch]
+        if not new_branches:
+            return None
+
+        return tree(label(t), new_branches)
+
+
 # Tree ADT
 
 def tree(label, branches=[]):
