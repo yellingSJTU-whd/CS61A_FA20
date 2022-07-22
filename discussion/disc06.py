@@ -65,3 +65,24 @@ def add_this_many(x, el, s):
             insertion_index = len(s)
             s[insertion_index:insertion_index] = [el]
         i += 1
+
+
+def filter(iterable, fn):
+    """
+    >>> is_even = lambda x: x % 2 == 0
+    >>> list(filter(range(5), is_even)) # a list of the values yielded from the call to fulter
+    [0, 2, 4]
+    >>> all_odd = (2*y-1 for y in range(5))
+    >>> list(filter(all_odd, is_even))
+    []
+    >>> naturals = (n for n in range(1,100))
+    >>> s = filter(naturals, is_even)
+    >>> next(s)
+    2
+    >>> next(s)
+    4
+    """
+    for x in iterable:
+        if fn(x):
+            filtered = x
+            yield filtered
