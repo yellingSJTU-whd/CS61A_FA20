@@ -204,8 +204,9 @@ def make_joint(withdraw, old_pass, new_pass):
         return old_account
 
     def wrapper(__amount, __password):
-        if __password == old_pass or __password == new_pass:
+        if __password == new_pass:
             return withdraw(__amount, old_pass)
+        return withdraw(__amount, __password)
 
     return wrapper
 
@@ -241,7 +242,18 @@ def remainders_generator(m):
     7
     11
     """
-    "*** YOUR CODE HERE ***"
+
+    def remainder(rem):
+        assert rem < m
+        naturals_generator = naturals()
+
+        while True:
+            natural_num = next(naturals_generator)
+            if natural_num % m == rem:
+                yield natural_num
+
+    for i in range(m):
+        yield remainder(i)
 
 
 def naturals():
