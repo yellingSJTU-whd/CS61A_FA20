@@ -238,7 +238,7 @@ class FireAnt(Ant):
     food_cost = 5
     # OVERRIDE CLASS ATTRIBUTES HERE
     # BEGIN Problem 5
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
 
     # END Problem 5
 
@@ -254,7 +254,16 @@ class FireAnt(Ant):
         if the fire ant dies.
         """
         # BEGIN Problem 5
-        "*** YOUR CODE HERE ***"
+        bees = self.place.bees
+        super().reduce_armor(amount)
+
+        reflected_damage = amount
+        if self.armor <= 0:
+            reflected_damage += self.damage
+
+        if bees:
+            for bee in list(bees):
+                Insect.reduce_armor(bee, reflected_damage)
         # END Problem 5
 
 
@@ -264,30 +273,47 @@ class HungryAnt(Ant):
     """
     name = 'Hungry'
     food_cost = 4
-    # OVERRIDE CLASS ATTRIBUTES HERE
+    time_to_digest = 3
     # BEGIN Problem 6
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
 
     # END Problem 6
 
     def __init__(self, armor=1):
         # BEGIN Problem 6
-        "*** YOUR CODE HERE ***"
+        super().__init__(armor)
+        self.digesting = 0
         # END Problem 6
 
     def eat_bee(self, bee):
         # BEGIN Problem 6
-        "*** YOUR CODE HERE ***"
+        Insect.reduce_armor(bee, bee.armor)
         # END Problem 6
 
     def action(self, gamestate):
         # BEGIN Problem 6
-        "*** YOUR CODE HERE ***"
+        if self.digesting:
+            self.digesting -= 1
+        else:
+            bees = self.place.bees
+            print('DEBUG:', str(bees))
+            if bees:
+                self.eat_bee(rANTdom_else_none(bees))
+                self.digesting = HungryAnt.time_to_digest
         # END Problem 6
 
 
 # BEGIN Problem 7
 # The WallAnt class
+class WallAnt(Ant):
+    name = 'Wall'
+    food_cost = 4
+    implemented = True
+
+    def __init__(self, armor=4):
+        super().__init__(armor)
+
+
 # END Problem 7
 
 
