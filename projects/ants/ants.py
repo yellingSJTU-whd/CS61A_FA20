@@ -53,6 +53,7 @@ class Insect:
     damage = 0
 
     # ADD CLASS ATTRIBUTES HERE
+    is_watersafe = False
 
     def __init__(self, armor, place=None):
         """Create an Insect with an ARMOR amount and a starting PLACE."""
@@ -106,6 +107,8 @@ class Ant(Insect):
     food_cost = 0
 
     # ADD CLASS ATTRIBUTES HERE
+    has_damage_doubled = False
+    blocks_path = True
 
     def __init__(self, armor=1):
         """Create an Ant with an ARMOR quantity."""
@@ -324,30 +327,45 @@ class Water(Place):
         """Add an Insect to this place. If the insect is not watersafe, reduce
         its armor to 0."""
         # BEGIN Problem 8
-        "*** YOUR CODE HERE ***"
+        super().add_insect(insect)
+        if not insect.is_watersafe:
+            Insect.reduce_armor(insect, insect.armor)
         # END Problem 8
 
 
 # BEGIN Problem 9
 # The ScubaThrower class
+class ScubaThrower(ThrowerAnt):
+    name = 'Scuba'
+    is_watersafe = True
+    implemented = True
+    food_cost = 6
+
+    def __init__(self, armor=1):
+        super().__init__(armor)
+
+
 # END Problem 9
 
 # BEGIN Problem EC
-class QueenAnt(Ant):  # You should change this line
+class QueenAnt(ScubaThrower):  # You should change this line
     # END Problem EC
     """The Queen of the colony. The game is over if a bee enters her place."""
 
     name = 'Queen'
     food_cost = 7
     # OVERRIDE CLASS ATTRIBUTES HERE
+    init_count = 0
     # BEGIN Problem EC
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
 
     # END Problem EC
 
     def __init__(self, armor=1):
         # BEGIN Problem EC
-        "*** YOUR CODE HERE ***"
+        super().__init__(armor)
+        self.is_true_queen = not self.init_count
+        QueenAnt.init_count += 1
         # END Problem EC
 
     def action(self, gamestate):
@@ -357,7 +375,18 @@ class QueenAnt(Ant):  # You should change this line
         Impostor queens do only one thing: reduce their own armor to 0.
         """
         # BEGIN Problem EC
-        "*** YOUR CODE HERE ***"
+        print('DEBUG:', self.is_true_queen)
+        if self.is_true_queen:
+            super().action(gamestate)
+            curr_place = self.place.exit
+            while curr_place is not None:
+                ant = curr_place.ant
+                if ant and not ant.has_damage_doubled:
+                    ant.damage *= 2
+                    ant.has_damage_doubled = True
+                curr_place = curr_place.exit
+        else:
+            super().reduce_armor(self.armor)
         # END Problem EC
 
     def reduce_armor(self, amount):
@@ -365,8 +394,14 @@ class QueenAnt(Ant):  # You should change this line
         remaining, signal the end of the game.
         """
         # BEGIN Problem EC
-        "*** YOUR CODE HERE ***"
+        super().reduce_armor(amount)
+        if self.armor <= 0 and self.is_true_queen:
+            bees_win()
         # END Problem EC
+
+    def remove_from(self, place):
+        if not self.is_true_queen:
+            super().remove_from(place)
 
 
 class AntRemover(Ant):
@@ -386,6 +421,7 @@ class Bee(Insect):
     damage = 1
 
     # OVERRIDE CLASS ATTRIBUTES HERE
+    is_watersafe = True
 
     def sting(self, ant):
         """Attack an ANT, reducing its armor by 1."""
@@ -400,7 +436,8 @@ class Bee(Insect):
         """Return True if this Bee cannot advance to the next Place."""
         # Special handling for NinjaAnt
         # BEGIN Problem Optional
-        return self.place.ant is not None
+        ant = self.place.ant
+        return ant is not None and ant.blocks_path
         # END Problem Optional
 
     def action(self, gamestate):
@@ -441,14 +478,19 @@ class NinjaAnt(Ant):
     damage = 1
     food_cost = 5
     # OVERRIDE CLASS ATTRIBUTES HERE
+    blocks_path = False
     # BEGIN Problem Optional 1
-    implemented = False  # Change to True to view in the GUI
+    implemented = True  # Change to True to view in the GUI
 
     # END Problem Optional 1
 
     def action(self, gamestate):
         # BEGIN Problem Optional 1
-        "*** YOUR CODE HERE ***"
+        bees = list(self.place.bees)
+        if bees:
+            for bee in bees:
+                bee.reduce_armor(self.damage)
+                print("DEBUG:", bee.armor)
         # END Problem Optional 1
 
 
