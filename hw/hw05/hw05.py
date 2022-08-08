@@ -204,16 +204,22 @@ def is_bst(t):
 
     if t.is_leaf():
         return True
-    children = t.branches
-    if len(children) == 1 and children[0].is_leaf():
-        return True
 
-    for subtree in t.branches:
+    children = t.branches
+    if len(children) > 2:
+        return False
+
+    if len(children) == 1:
+        return is_bst(children[0])
+
+    for subtree in children:
         if not is_bst(subtree):
-            print('DEBUG:', 'subtree is not BST', subtree.label)
             return False
 
-    return bst_min(t) <= t.label <= bst_max(t)
+    if not bst_min(t) <= t.label <= bst_max(t):
+        return False
+
+    return True
 
 
 def preorder(t):
@@ -226,7 +232,15 @@ def preorder(t):
     >>> preorder(Tree(2, [Tree(4, [Tree(6)])]))
     [2, 4, 6]
     """
-    "*** YOUR CODE HERE ***"
+    if t and t.is_leaf():
+        return [t.label]
+
+    preorder_list = [t.label]
+    for branch in t.branches:
+        preorder_list += preorder(branch)
+
+    return preorder_list
+
 
 
 def path_yielder(t, value):
@@ -264,12 +278,13 @@ def path_yielder(t, value):
     [[0, 2], [0, 2, 1, 2]]
     """
 
-    "*** YOUR CODE HERE ***"
+    if t and t.label == value:
+        yield [t.label]
 
-    for _______________ in _________________:
+    for branch in t.branches:
         for _______________ in _________________:
             "*** YOUR CODE HERE ***"
-
+#
 
 class Link:
     """A linked list.
