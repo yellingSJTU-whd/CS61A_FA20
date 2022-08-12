@@ -40,9 +40,9 @@ def fib(n):
     return fib(n - 2) + fib(n - 1)
 
 
-########
-# Link #
-########
+##########
+#  Link  #
+##########
 
 class Link:
     """A linked list with a first element and the rest."""
@@ -68,6 +68,13 @@ class Link:
     def __len__(self):
         return 1 + len(self.rest)
 
+    def __str__(self):
+        string = '<'
+        while self.rest is not Link.empty:
+            string += str(self.first) + ' '
+        self = self.rest
+        return string + str(self.first) + '>'
+
 
 def link_expression(s):
     """Return a string that would evaluate to s."""
@@ -92,15 +99,15 @@ def map_link(f, s):
         return Link(f(s.first), map_link(f, s.rest))
 
 
-def filter_link(f, s):
-    if s is Link.empty:
-        return s
-    else:
-        filtered = filter_link(f, s.rest)
-        if f(s.first):
-            return Link(s.first, filtered)
-        else:
-            return filtered
+# def filter_link(f, s):
+#     if s is Link.empty:
+#         return s
+#     else:
+#         filtered = filter_link(f, s.rest)
+#         if f(s.first):
+#             return Link(s.first, filtered)
+#         else:
+#             return filtered
 
 
 def join_link(s, separator):
@@ -124,7 +131,8 @@ def partitions(n, m):
         using_m = partitions(n - m, m)
         with_m = map_link(lambda s: Link(m, s), using_m)
         without_m = partitions(n, m - 1)
-        print('DEBUG', type(with_m), type(without_m), n, m)
+        if not with_m:
+            return without_m
         return with_m + without_m
 
 
@@ -132,3 +140,184 @@ def print_partitions(n, m):
     lists = partitions(n, m)
     strings = map_link(lambda s: join_link(s, " + "), lists)
     print(join_link(strings, "\n"))
+
+
+##########
+#  Tree  #
+##########
+
+class Tree:
+    def __init__(self, label, branches=()):
+        self.label = label
+        for branch in branches:
+            assert isinstance(branch, Tree)
+        self.branches = branches
+
+    def __repr__(self):
+        if self.branches:
+            return 'Tree({0}, {1})'.format(self.label, repr(self.branches))
+        else:
+            return 'Tree({0})'.format(repr(self.label))
+
+    def is_leaf(self):
+        return not self.branches
+
+
+def fib_tree(n):
+    if n == 1:
+        return Tree(0)
+    elif n == 2:
+        return Tree(1)
+    else:
+        left = fib_tree(n - 2)
+        right = fib_tree(n - 1)
+        return Tree(left.label + right.label, (left, right))
+
+
+def sum_labels(t):
+    """Sum the labels of a Tree instance, which may be None."""
+    return t.label + sum([sum_labels(b) for b in t.branches])
+
+
+##########
+#  Sets  #
+##########
+
+class A:
+    def __init__(self, x):
+        self.x = x
+
+    def __repr__(self):
+        return self.x
+
+    def __str__(self):
+        return self.x * 2
+
+
+class B:
+    def __init__(self):
+        print("boo!")
+        self.a = []
+
+    def add_a(self, a):
+        self.a.append(a)
+
+    def __repr__(self):
+        print(len(self.a))
+        ret = ""
+        for a in self.a:
+            ret += str(a)
+        return ret
+
+
+def sum_nums(lnk):
+    """
+    >>> a = Link(1, Link(6, Link(7)))
+    >>> sum_nums(a)
+    14
+    """
+
+    if lnk is Link.empty:
+        return 0
+    return lnk.first + sum_nums(lnk.rest)
+
+
+def multiply_lnks(lst_of_lnks):
+    """
+    >>> a = Link(2, Link(3, Link(5)))
+    >>> b = Link(6, Link(4, Link(2)))
+    >>> c = Link(4, Link(1, Link(0, Link(2))))
+    >>> p = multiply_lnks([a, b, c])
+    >>> p.first
+    48
+    >>> p.rest.first
+    12
+    >>> p.rest.rest.rest is Link.empty
+    True
+    """
+    res = Link(1, Link.empty)
+    for i in range(len(lst_of_lnks)):
+        if lst_of_lnks[i] is Link.empty:
+            return Link.empty
+        res.first *= lst_of_lnks[i].first
+        lst_of_lnks[i] = lst_of_lnks[i].rest
+    res.rest = multiply_lnks(lst_of_lnks)
+    return res
+
+
+def flip_two(lnk):
+    """
+    >>> one_lnk = Link(1)
+    >>> flip_two(one_lnk)
+    >>> one_lnk
+    Link(1)
+    >>> lnk_ = Link(1, Link(2, Link(3, Link(4, Link(5)))))
+    >>> flip_two(lnk_)
+    >>> lnk_
+    Link(2, Link(1, Link(4, Link(3, Link(5)))))
+    """
+    if lnk is Link.empty or lnk.rest is Link.empty:
+        return
+
+    cache, lnk.first = lnk.first, lnk.rest.first
+    lnk.rest.first = cache
+
+    flip_two(lnk.rest.rest)
+
+
+def filter_link(link, f):
+    """
+    >>> link_ = Link(1, Link(2, Link(3)))
+    >>> g = filter_link(link_, lambda x: x % 2 == 0)
+    >>> next(g)
+    2
+    >>> next(g)
+    Traceback (most recent call last):
+        File "<stdin>", line 1, in <module>
+    StopIteration
+    >>> list(filter_link(link_, lambda x: x % 2 != 0))
+    [1, 3]
+    """
+    curr = link
+    while curr is not Link.empty:
+        if f(curr.first):
+            yield curr.first
+        curr = curr.rest
+
+
+def make_even(t):
+    """
+    >>> t = Tree(1, [Tree(2, [Tree(3)]), Tree(4), Tree(5)])
+    >>> make_even(t)
+    >>> t.label
+    2
+    >>> t.branches[0].branches[0].label
+    4
+    """
+    if not t:
+        return
+
+    if t.label % 2 != 0:
+        t.label += 1
+
+    for branch in t.branches:
+        make_even(branch)
+
+
+def square_tree(t):
+    """
+    Mutates a Tree t by squaring all its elements.
+
+    >>> t = Tree(3, [Tree(4)])
+    >>> square_tree(t)
+    >>> t.label
+    9
+    >>> t.branches[0].label
+    16
+    """
+    if not t:
+        return
+
+    t.label *= t.label
+    for branch in t.branches:
+        square_tree(branch)
