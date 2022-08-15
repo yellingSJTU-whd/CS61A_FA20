@@ -1,3 +1,6 @@
+from operator import mul
+
+
 def count_function_call(func):
     def counted(*args):
         counted.call_count += 1
@@ -321,3 +324,67 @@ def square_tree(t):
     t.label *= t.label
     for branch in t.branches:
         square_tree(branch)
+
+
+def find_paths(t, entry):
+    """
+    >>> tree_ex = Tree(2, [Tree(7, [Tree(3), Tree(6, [Tree(5), Tree(11)])]), Tree(1, [Tree(5)])])
+    >>> find_paths(tree_ex, 5)
+    [[2, 7, 6, 5], [2, 1, 5]]
+    >>> find_paths(tree_ex, 12)
+    []
+    """
+    res = []
+
+    if t.label == entry:
+        res.append([t.label])
+
+    for branch in t.branches:
+        paths = find_paths(branch, entry)
+
+        for path in paths:
+            new_path = [t.label] + path
+            res.append(new_path)
+
+    return res
+
+
+def combine_tree(t1, t2, combiner):
+    """
+    >>> a = Tree(1, [Tree(2, [Tree(3)])])
+    >>> b = Tree(4, [Tree(5, [Tree(6)])])
+    >>> combined = combine_tree(a, b, mul)
+    >>> combined.label
+    4
+    >>> combined.branches[0].label
+    10
+    """
+    if t1 and t2:
+        tree = Tree(combiner(t1.label, t2.label))
+
+        for x, y in zip(t1.branches, t2.branches):
+            subtree = combine_tree(x, y, combiner)
+
+            if tree.branches:
+                tree.branches += subtree
+            else:
+                tree.branches = [subtree]
+
+        return tree
+
+
+def alt_tree_map(t, map_fn):
+    """
+    >>> t = Tree(1, [Tree(2, [Tree(3)]), Tree(4)])
+    >>> negate = lambda x: -x
+    >>> alt_tree_map(t, negate)
+    Tree(-1, [Tree(2, [Tree(-3)]), Tree(4)])
+    """
+    if t and t.label:
+        t.label = map_fn(t.label)
+
+        for branch in t.branches:
+            for deeper in branch.branches:
+                alt_tree_map(deeper, map_fn)
+
+    return t
