@@ -32,8 +32,9 @@ def subseqs(s):
     if not s:
         return [[]]
     else:
-        subseq = subseqs(s[1:])
-        return subseq + insert_into_all(s[0], subseq)
+        drop_first_element = subseqs(s[1:])
+        using_first_element = insert_into_all(s[0], drop_first_element)
+        return using_first_element + drop_first_element
 
 
 def inc_subseqs(s):
@@ -57,9 +58,9 @@ def inc_subseqs(s):
         elif s[0] < prev:
             return subseq_helper(s[1:], prev)
         else:
-            a = subseq_helper(s[1:], s[0])
-            b = subseq_helper(s[1:], prev)
-            return insert_into_all(s[0], a) + b
+            use_first_elem = subseq_helper(s[1:], s[0])
+            drop_first_elem = subseq_helper(s[1:], prev)
+            return insert_into_all(s[0], use_first_elem) + drop_first_elem
 
     return subseq_helper(s, -1)
 
@@ -175,26 +176,26 @@ class Keyboard:
     """
 
     def __init__(self, *args):
-        ________________
-        for _________ in ________________:
-            ________________
+        self.buttons = {}
+        for button in args:
+            self.buttons[button.pos] = button
 
     def press(self, info):
         """Takes in a position of the button pressed, and
         returns that button's output"""
-        if ____________________:
-            ________________
-            ________________
-            ________________
-        ________________
+        if info in self.buttons:
+            button = self.buttons[info]
+            button.times_pressed += 1
+            return button.key
+        return ''
 
     def typing(self, typing_input):
         """Takes in a list of positions of buttons pressed, and
         returns the total output"""
-        ________________
-        for ________ in ____________________:
-            ________________
-        ________________
+        output = ''
+        for typing in typing_input:
+            output += self.press(typing)
+        return output
 
 
 def make_advanced_counter_maker():
@@ -226,19 +227,40 @@ def make_advanced_counter_maker():
     >>> tom_counter('global-count')
     1
     """
-    ________________
+    global_count = 0
 
-    def ____________(__________):
-        ________________
+    def make_foundation_counter():
+        count = 0
 
-        def ____________(__________):
-            ________________
-            "*** YOUR CODE HERE ***"
-            # as many lines as you want
+        def dispatch_func(info):
+            dispatch_dict = {'count': increase,
+                             'global-count': global_increase,
+                             'reset': reset,
+                             'global-reset': global_reset}
+            func = dispatch_dict[info]
+            return func()
 
-        ________________
+        def increase():
+            nonlocal count
+            count += 1
+            return count
 
-    ________________
+        def global_increase():
+            nonlocal global_count
+            global_count += 1
+            return global_count
+
+        def reset():
+            nonlocal count
+            count = 0
+
+        def global_reset():
+            nonlocal global_count
+            global_count = 0
+
+        return dispatch_func
+
+    return make_foundation_counter
 
 
 def trade(first, second):
@@ -270,9 +292,11 @@ def trade(first, second):
     """
     m, n = 1, 1
 
-    equal_prefix = lambda: ______________________
-    while _______________________________:
-        if __________________:
+    def equal_prefix():
+        return sum(first[:m]) == sum(second[:n])
+
+    while not equal_prefix() and m <= len(first) and n <= len(second):
+        if sum(first[:m]) <= sum(second[:n]):
             m += 1
         else:
             n += 1
@@ -310,11 +334,11 @@ def shuffle(cards):
     ['A♡', 'A♢', 'A♤', 'A♧', '2♡', '2♢', '2♤', '2♧', '3♡', '3♢', '3♤', '3♧']
     """
     assert len(cards) % 2 == 0, 'len(cards) must be even'
-    half = _______________
+    length = len(cards) // 2
     shuffled = []
-    for i in _____________:
-        _________________
-        _________________
+    for first_half, another_half in zip(cards[:length], cards[length:]):
+        shuffled.append(first_half)
+        shuffled.append(another_half)
     return shuffled
 
 
@@ -333,14 +357,13 @@ def insert(link, value, index):
     >>> insert(link, 4, 5)
     IndexError
     """
-    if ____________________:
-        ____________________
-        ____________________
-        ____________________
-    elif ____________________:
-        ____________________
+    if index == 0:
+        link.rest = Link(link.first, link.rest)
+        link.first = value
+    elif link.rest is Link.empty:
+        raise IndexError
     else:
-        ____________________
+        insert(link.rest, value, index - 1)
 
 
 def deep_len(lnk):
@@ -357,12 +380,12 @@ def deep_len(lnk):
     >>> deep_len(levels)
     5
     """
-    if ______________:
+    if lnk is Link.empty:
         return 0
-    elif ______________:
+    elif type(lnk) == int:
         return 1
     else:
-        return _________________________
+        return deep_len(lnk.first) + deep_len(lnk.rest)
 
 
 def make_to_string(front, mid, back, empty_repr):
@@ -382,10 +405,10 @@ def make_to_string(front, mid, back, empty_repr):
     """
 
     def printer(lnk):
-        if ______________:
-            return _________________________
+        if lnk is Link.empty:
+            return empty_repr
         else:
-            return _________________________
+            return front + str(lnk.first) + mid + printer(lnk.rest) + back
 
     return printer
 
@@ -407,11 +430,11 @@ def prune_small(t, n):
     >>> t3
     Tree(6, [Tree(1), Tree(3, [Tree(1), Tree(2)])])
     """
-    while ___________________________:
-        largest = max(_______________, key=____________________)
-        _________________________
-    for __ in _____________:
-        ___________________
+    while len(t.branches) > n:
+        largest = max(t.branches, key=lambda tree: tree.label)
+        t.branches.remove(largest)
+    for subtree in t.branches:
+        prune_small(subtree, n)
 
 
 class Link:
