@@ -53,6 +53,7 @@ def calc_eval(exp):
     else:
         raise TypeError(str(exp) + ' is not a number or call expression')
 
+
 def calc_apply(operator, args):
     """Apply the named operator to a list of args.
 
@@ -88,11 +89,12 @@ def calc_apply(operator, args):
         if len(args) == 0:
             raise TypeError(operator + ' requires at least 1 argument')
         elif len(args) == 1:
-            return 1/args.first
+            return 1 / args.first
         else:
             return reduce(truediv, args.second, args.first)
     else:
         raise TypeError(operator + ' is an unknown operator')
+
 
 def simplify(value):
     """Return an int if value is an integer, or value otherwise.
@@ -108,6 +110,7 @@ def simplify(value):
         return int(value)
     return value
 
+
 def reduce(fn, scheme_list, start):
     """Reduce a recursive list of Pairs using fn and a start value.
 
@@ -118,6 +121,7 @@ def reduce(fn, scheme_list, start):
         return start
     return reduce(fn, scheme_list.second, fn(start, scheme_list.first))
 
+
 def as_scheme_list(*args):
     """Return a recursive list of Pairs that contains the elements of args.
 
@@ -127,6 +131,7 @@ def as_scheme_list(*args):
     if len(args) == 0:
         return nil
     return Pair(args[0], as_scheme_list(*args[1:]))
+
 
 @main
 def read_eval_print_loop():
