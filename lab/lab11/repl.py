@@ -26,9 +26,19 @@ if __name__ == '__main__':
                     print(repr(expr))
                 else:
                     print(expr.eval(global_env))
-        except (SyntaxError, NameError, TypeError) as err:
-            print(type(err).__name__ + ':', err)
+        except (AttributeError, NameError):
+            print('undefined operator')
+        except KeyError:
+            print('undefined operand')
+        except TypeError:
+            print('invalid operation')
+        except ZeroDivisionError:
+            print('divided by zero!')
+        except SyntaxError:
+            print('incorrect syntax')
+        except OverflowError:
+            print('over flow')
+
         except (KeyboardInterrupt, EOFError):  # Ctrl-C, Ctrl-D
             print()  # blank line
             break  # exit while loop (and end program)
-
