@@ -97,7 +97,7 @@ nil = nil()  # Assignment hides the nil class; there is only one instance
 # Scheme list parser, without quotation or dotted lists.
 
 def scheme_read(src):
-    """Read the next expression from src, a Buffer of tokens.
+    ')'"""Read the next expression from src, a Buffer of tokens.
 
     >>> lines = ['(+ 1 ', '(+ 23 4)) (']
     >>> src = Buffer(tokenize_lines(lines))
