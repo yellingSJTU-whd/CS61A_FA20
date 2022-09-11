@@ -324,7 +324,7 @@ def do_lambda_form(expressions, env):
     body = expressions.rest
     if scheme_listp(body):
         return LambdaProcedure(formals, body, env)
-    raise SchemeError
+    raise SchemeError("illegal lambda form: {}".format(expressions))
     # END PROBLEM 8
 
 
@@ -593,7 +593,8 @@ class MuProcedure(Procedure):
         self.body = body
 
     # BEGIN PROBLEM 18
-    "*** YOUR CODE HERE ***"
+    def make_call_frame(self, args, env):
+        return env.make_child_frame(self.formals, args)
 
     # END PROBLEM 18
 
@@ -611,7 +612,10 @@ def do_mu_form(expressions, env):
     formals = expressions.first
     validate_formals(formals)
     # BEGIN PROBLEM 18
-    "*** YOUR CODE HERE ***"
+    body = expressions.rest
+    if scheme_listp(body):
+        return MuProcedure(formals, body)
+    raise SchemeError("illegal mu form: {}".format(expressions))
     # END PROBLEM 18
 
 
