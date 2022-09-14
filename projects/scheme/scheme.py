@@ -49,6 +49,7 @@ def self_evaluating(expr):
     return (scheme_atomp(expr) and not scheme_symbolp(expr)) or expr is None
 
 
+@trace
 def scheme_apply(procedure, args, env):
     """Apply Scheme PROCEDURE to argument values ARGS (a Scheme list) in
     environment ENV."""
