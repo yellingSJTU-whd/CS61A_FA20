@@ -81,46 +81,93 @@ select a.name
 from record as a,
      record as b
 where a.supervisor = b.name
-  and a.division != b.division;
+  and a.division <> b.division;
 
 /* 4.1 Write a query that outputs each supervisor and the sum of salaries of all the employees
    they supervise.
  */
-with supervisor(name) as (select distinct supervisor from record)
-select a.name, sum(b.salary)
-from supervisor as a,
-     record as b
-where b.supervisor = a.name
-group by b.supervisor;
+select supervisor, sum(salary)
+from record
+group by supervisor;
 
 /* 4.2 Write a query that outputs the days of the week for which fewer than 5 employees
 have a meeting. You may assume no department has more than one meeting on a
 given day. */
-with days(name) as (select 'Sunday'
-                    union
-                    select 'Monday'
-                    union
-                    select 'Tuesday'
-                    union
-                    select 'Wednesday'
-                    union
-                    select 'Thursday'
-                    union
-                    select 'Friday'
-                    union
-                    select 'Saturday'),
-     meetings_info(name, day) as (select a.name, b.day
-                                  from record as a,
-                                       meetings as b
-                                  where a.division = b.division)
-select a.name
-from days as a,
-     meetings_info as b
-group by b.day
-having count(distinct b.name) < 5;
+select day
+from meetings as m,
+     record as r
+where r.division = m.division
+group by day
+having count(*) < 5;
 
-create table meeting_info as
-select a.name, b.day
-from record as a,
-     meetings as b
-where a.division = b.division;
+/* 4.3 Write a query that outputs all divisions for which there is more than one employee,
+and all pairs of employees within that division that have a combined salary less
+than 100,000. */
+with pairs(name0, salary0, name1, salary1, division) as
+         (select a.name, a.salary, b.name, b.salary, a.division
+          from record as a,
+               record as b
+          where a.division = b.division
+            and a.name < b.name)
+select division, name0 || ', ' || name1
+from pairs
+where salary0 + salary1 < 100000;
+
+create table courses as
+select 'John DeNero' as Professor, 'CS 61C' as Course, 'Sp20' as Semester
+union
+select 'John DeNero', 'CS 61A', 'Fa19'
+union
+select 'Dan Garcia', 'CS 61C', 'Sp19'
+union
+select 'John DeNero', 'CS 61A', 'Fa18'
+union
+select 'Dan Garcia', 'CS 10', 'Fa18'
+union
+select 'Josh Hug', 'CS 61B', 'Sp18'
+union
+select 'John DeNero', 'CS 61A', 'Sp18'
+union
+select 'John DeNero', 'CS 61A', 'Fa17'
+union
+select 'Paul Hilfinger', 'CS 61A', 'Fa17'
+union
+select 'Paul Hilfinger', 'CS 61A', 'Sp17'
+union
+select 'John DeNero', 'Data 8', 'Sp17'
+union
+select 'Josh Hug', 'CS 61B', 'Sp17'
+union
+select 'Satish Rao', 'CS 70', 'Sp17'
+union
+select 'Nicholas Weaver', 'CS 61C', 'Sp17'
+union
+select 'Gerald Friedland', 'CS 61C', 'Sp17';
+
+/* 5.1 Create a table called num_taught that contains three columns: professor, the
+course they taught, and the number of times they taught each course. */
+create table num_taught as
+select professor, course, count(*) as count
+from courses
+group by professor, course;
+
+/* 5.2 Write a query that outputs two professors and a course if they have taught that
+course the same number of times. You may use the num taught table you created
+in the previous question. */
+select a.professor as prof0, b.professor as prof1, a.course
+from num_taught as a,
+     num_taught as b
+where a.professor < b.professor
+  and a.course = b.course
+  and a.count = b.count;
+
+/* 5.3 Write a query that outputs two professors if they co-taught (taught the same course
+at the same time) the same course more than once. */
+select a.Professor as prof0, b.Professor as pro1
+from courses as a,
+     courses as b
+where a.Professor < b.Professor
+  and a.Course = b.Course
+  and a.Semester = b.Semester
+group by prof0, pro1, a.Course
+having count(*) > 1;
