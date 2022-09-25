@@ -1,5 +1,7 @@
 from operator import add, sub, mul
 
+from ucb import trace
+
 
 def prune_min(t):
     """Prune the tree mutatively from the bottom up.
@@ -39,7 +41,14 @@ def num_splits(s, d):
     >>> num_splits([1, 4, 6, 8, 2, 9, 5], 3)
     12
     """
-    "*** YOUR CODE HERE ***"
+
+    def helper(lst, running_diff):
+        if not lst:
+            return 1 if abs(running_diff) <= d else 0
+        else:
+            return helper(lst[1:], running_diff + lst[0]) + helper(lst[1:], running_diff - lst[0])
+
+    return helper(s, 0) // 2
 
 
 class Account(object):
@@ -106,11 +115,22 @@ class CheckingAccount(Account):
     def withdraw(self, amount):
         return Account.withdraw(self, amount + self.withdraw_fee)
 
-    "*** YOUR CODE HERE ***"
+    def deposit_check(self, check):
+        assert isinstance(check, Check)
+        if check.payable_to != self.holder:
+            print('The police have been notified.')
+        elif check.deposited:
+            print('The police have been notified.')
+        else:
+            check.deposited = True
+            return check.amount
 
 
 class Check(object):
-    "*** YOUR CODE HERE ***"
+    def __init__(self, payable_to, amount):
+        self.payable_to = payable_to
+        self.amount = amount
+        self.deposited = False
 
 
 def align_skeleton(skeleton, code):
@@ -147,32 +167,32 @@ def align_skeleton(skeleton, code):
             cost: the cost of the corrections, in edits
         """
         if skeleton_idx == len(skeleton) and code_idx == len(code):
-            return _________, ______________
+            return '', 0
         if skeleton_idx < len(skeleton) and code_idx == len(code):
             edits = "".join(["-[" + c + "]" for c in skeleton[skeleton_idx:]])
-            return _________, ______________
+            return edits, len(skeleton) - skeleton_idx - 1
         if skeleton_idx == len(skeleton) and code_idx < len(code):
             edits = "".join(["+[" + c + "]" for c in code[code_idx:]])
-            return _________, ______________
+            return edits, len(code) - code_idx - 1
 
         possibilities = []
         skel_char, code_char = skeleton[skeleton_idx], code[code_idx]
         # Match
         if skel_char == code_char:
-            _________________________________________
-            _________________________________________
-            possibilities.append((_______, ______))
+            match, cost = helper_align(skeleton_idx + 1, code_idx + 1)
+            match = skeleton[skeleton_idx] + match
+            possibilities.append((match, cost))
         # Insert
-        _________________________________________
-        _________________________________________
-        possibilities.append((_______, ______))
+        edits, cost = helper_align(skeleton_idx, code_idx + 1)
+        edits, cost = ''.join(['+[', code[code_idx], ']']) + edits, cost + 1
+        possibilities.append((edits, cost))
         # Delete
-        _________________________________________
-        _________________________________________
-        possibilities.append((_______, ______))
+        edits, cost = helper_align(skeleton_idx + 1, code_idx)
+        edits, cost = ''.join(['-[', skeleton[skeleton_idx], ']']) + edits, cost + 1
+        possibilities.append((edits, cost))
         return min(possibilities, key=lambda x: x[1])
 
-    result, cost = ________________________
+    result, cost = helper_align(0, 0)
     return result
 
 
@@ -188,8 +208,26 @@ def foldl(link, fn, z):
     """
     if link is Link.empty:
         return z
-    "*** YOUR CODE HERE ***"
-    return foldl(______, ______, ______)
+    operand = link.first
+    return foldl(link.rest, fn, fn(z, operand))
+
+
+def foldr(link, fn, z):
+    """
+    Right fold
+    >>> lst = Link(3, Link(2, Link(1)))
+    >>> foldr(lst, sub, 0) # (3 - (2 - (1 - 0)))
+    2
+    >>> foldr(lst, add, 0) # (3 + (2 + (1 + 0)))
+    6
+    >>> foldr(lst, mul, 1) # (3 * (2 * (1 * 1)))
+    6
+    """
+    if link is Link.empty:
+        return z
+    if link.rest is Link.empty:
+        return fn(link.first, z)
+    return fn(link.first, foldr(link.rest, fn, z))
 
 
 def filterl(lst, pred):
@@ -198,7 +236,12 @@ def filterl(lst, pred):
     >>> filterl(lst, lambda x: x % 2 == 0)
     Link(4, Link(2))
     """
-    "*** YOUR CODE HERE ***"
+    assert isinstance(lst, Link) or lst is Link.empty
+    if lst is Link.empty:
+        return lst
+    if pred(lst.first):
+        return Link(lst.first, filterl(lst.rest, pred))
+    return filterl(lst.rest, pred)
 
 
 def reverse(lst):
@@ -211,7 +254,25 @@ def reverse(lst):
     >>> reversed is Link.empty
     True
     """
-    "*** YOUR CODE HERE ***"
+
+    # return foldl(lst, lambda x, y: Link(y, x), Link.empty)
+
+    def sink_first(link):
+        """Sinking the first element in a Link object using tail recursion."""
+        if link is Link.empty or link.rest is Link.empty:
+            return link
+        tmp = link.rest.first
+        link.rest.first = link.first
+        link.first = tmp
+        sink_first(link.rest)
+
+    assert lst is Link.empty or isinstance(lst, Link)
+    if lst is Link.empty or lst.rest is Link.empty:
+        return lst
+
+    reverse(lst.rest)
+    sink_first(lst)
+    return lst
 
 
 identity = lambda x: x
@@ -229,7 +290,11 @@ def foldl2(link, fn, z):
     """
 
     def step(x, g):
-        "*** YOUR CODE HERE ***"
+        """
+        x --> list element in order, like 3->2->1 for Link(3, Link(2, Link(1)))
+        g --> identity at this scenario
+        """
+        return lambda y: fn(g(y), x)
 
     return foldr(link, step, identity)(z)
 
