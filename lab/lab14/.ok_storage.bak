@@ -1,7 +1,7 @@
 'prune_min-correct', (0, 66)
 'split-at-correct', (512, 66)
 'compose-all-correct', (1024, 66)
-'num_splits-correct', (1536, 70)
+'num_splits-correct', (1536, 66)
 'CheckingAccount-correct', (2048, 70)
 'align_skeleton-correct', (2560, 70)
 'foldl-correct', (3072, 70)

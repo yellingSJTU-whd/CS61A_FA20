@@ -224,3 +224,105 @@ def widest_level(t):
     """
     levels = []
     x = [t]
+
+    while x:
+        curr_level, next_level = [[tree.label] for tree in x], [tree.branches for tree in x]
+        levels, x = levels + [sum(curr_level, [])], sum(next_level, [])
+    return max(levels, key=lambda lst: len(lst))
+
+
+class Emotion(object):
+    """
+    >>> Emotion.num
+    0
+    >>> joy = Joy()
+    >>> sadness = Sadness()
+    >>> Emotion.num # number of Emotion instances created
+    2
+    >>> joy.power
+    5
+    >>> joy.catchphrase() # Print Joy's catchphrase
+    Think positive thoughts
+    >>> sadness.catchphrase() # Print Sad's catchphrase
+    I'm positive you will get lost
+    >>> sadness.power
+    5
+    >>> joy.feeling(sadness) # When both Emotions have same power value, print "Together"
+    Together
+    >>> joy.power = 7
+    >>> joy.feeling(sadness) #  Print the catchphrase of the more powerful feeling before the less powerful feeling
+    Think positive thoughts
+    I'm positive you will get lost
+    >>> sadness.feeling(joy)
+    Think positive thoughts
+    I'm positive you will get lost
+    """
+
+    num = 0
+
+    def __init__(self):
+        self.power = 5
+        Emotion.num += 1
+
+    def feeling(self, other):
+        if self.power == other.power:
+            print('Together')
+        elif self.power > other.power:
+            self.catchphrase()
+            other.catchphrase()
+        else:
+            other.catchphrase()
+            self.catchphrase()
+
+
+class Joy(Emotion):
+    def catchphrase(self):
+        print('Think positive thoughts')
+
+
+class Sadness(Emotion):
+    def catchphrase(self):
+        print("I'm positive you will get lost")
+
+
+#   5.1 Write a function that takes a sorted linked list of integers and mutates it so that
+#   all duplicates are removed.
+
+def remove_duplicates(lnk):
+    """
+    >>> lnk =  Link(1, Link(1, Link(1, Link(1, Link(5)))))
+    >>> remove_duplicates(lnk)
+    >>> lnk
+    Link(1, Link(5))
+    """
+    if not lnk or not lnk.rest:
+        return
+
+    if lnk.first == lnk.rest.first:
+        lnk.rest = lnk.rest.rest
+        remove_duplicates(lnk)
+    else:
+        remove_duplicates(lnk.rest)
+
+
+#   6.1 Write a generator function that yields functions that are repeated applications of
+#   a one-argument function f. The first function yielded should apply f 0 times (the
+#   identity function), the second function yielded should apply f once, etc.
+
+def repeated(f):
+    """
+    >>> double = lambda x: 2*x
+    >>> funcs = repeated(double)
+    >>> identity = next(funcs)
+    >>> double = next(funcs)
+    >>> quad = next(funcs)
+    >>> oct = next(funcs)
+    >>> quad(1)
+    4
+    >>> oct(1)
+    8
+    >>> [g(1) for _, g in
+    ... zip(range(5), repeated(lambda x: 2 * x))]
+    [1, 2, 4, 8, 16]
+    """
+
