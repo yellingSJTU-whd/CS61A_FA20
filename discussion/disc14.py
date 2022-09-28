@@ -1,3 +1,6 @@
+from operator import add, mul
+
+
 def paths(x, y):
     """Return a list of ways to reach y from x by repeated
     incrementing or doubling.
@@ -10,14 +13,14 @@ def paths(x, y):
     >>> paths(3, 3) # No calls is a valid path
     [[3]]
     """
-    if x == y:
+    if x > y:
+        return []
+    elif x == y:
         return [[x]]
-    elif 2 * x > y:
-        return [[x] + path for path in paths(x + 1, y)]
     else:
-        doubling_path = [[x] + path for path in paths(2 * x, y)]
-        incrementing_path = [[x] + path for path in paths(x + 1, y)]
-        return doubling_path + incrementing_path
+        doubling_path = paths(2 * x, y)
+        incrementing_path = paths(x + 1, y)
+        return [[x] + path for path in doubling_path + incrementing_path]
 
 
 def merge(s1, s2):
@@ -194,23 +197,15 @@ def long_paths(tree, n):
     [Link(0, Link(11, Link(12, Link(13, Link(14)))))]
     """
 
-    def path_list_yielder(t, deepth):
-        assert t is None or isinstance(t, Tree)
-
-        if t and deepth <= 0:
-            if t.is_leaf():
-                yield [t.label]
+    def path_link_yielder(t, depth):
+        if t and depth <= 0 and t.is_leaf():
+            yield Link(t.label)
 
         for branch in t.branches:
-            for lst in path_list_yielder(branch, deepth - 1):
-                yield [t.label] + lst
+            for link in path_link_yielder(branch, depth - 1):
+                yield Link(t.label, link)
 
-    def lst_to_link(lst):
-        if not lst:
-            return Link.empty
-        return Link(lst[0], lst_to_link(lst[1:]))
-
-    return [lst_to_link(lst) for lst in path_list_yielder(tree, n)]
+    return list(path_link_yielder(tree, n))
 
 
 def widest_level(t):
@@ -226,9 +221,9 @@ def widest_level(t):
     x = [t]
 
     while x:
-        curr_level, next_level = [[tree.label] for tree in x], [tree.branches for tree in x]
-        levels, x = levels + [sum(curr_level, [])], sum(next_level, [])
-    return max(levels, key=lambda lst: len(lst))
+        levels.append([tree.label for tree in x])
+        x = sum([tree.branches for tree in x])
+    return max(levels, key=len)
 
 
 class Emotion(object):
@@ -325,4 +320,27 @@ def repeated(f):
     ... zip(range(5), repeated(lambda x: 2 * x))]
     [1, 2, 4, 8, 16]
     """
+    g = lambda x: x
+    while True:
+        yield g
+        # g = lambda x: f(g(x))
+        g = (lambda y: lambda x: f(y(x)))(g)
+    # lambda / lazy evaluation / environment
 
+
+#   6.3 Implement accumulate, which takes in an iterable and a function f and yields
+#   each accumulated value from applying f to the running total and the next element.
+
+def accumulate(iterable, f):
+    """
+    >>> list(accumulate([1, 2, 3, 4, 5], add))
+    [1, 3, 6, 10, 15]
+    >>> list(accumulate([1, 2, 3, 4, 5], mul))
+    [1, 2, 6, 24, 120]
+    """
+
+    it = iter(iterable)
+    accumulated = None
+    for item in it:
+        accumulated = f(accumulated, item) if accumulated else item
+        yield accumulated
